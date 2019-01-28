@@ -1,0 +1,23 @@
+// Results Home
+SELECT 	anuncios.id, 
+		anuncios.titulo, 
+        --anuncios.Descripcion, 
+        imagen_anuncio.ruta_imagen,
+        imagen_anuncio.imagen,
+        imagen_anuncio.destacada,
+        vehiculos.id,
+        vehiculos.year,
+        vehiculos.kilometraje,
+        vehiculos.equipamento,
+        vehiculos.transmision,
+        vehiculos.estilo_carroceria
+FROM `anuncios` LEFT JOIN imagen_anuncio
+on imagen_anuncio.id = anuncios.id
+INNER JOIN vehiculos 
+ON vehiculos.id =  anuncios.id_vehiculo
+WHERE anuncios.id = 1
+ORDER BY anuncios.created_at
+
+
+
+// Car Page
