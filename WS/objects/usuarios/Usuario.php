@@ -11,6 +11,11 @@
         private $table_name = "usuarios";
     
         // object properties
+        public $id_usuatrio;
+        public $nombre_usuario;
+        public $pass_usuario;
+        public $correo_usuario;
+        
         public $id_anuncio;
 
 
@@ -45,7 +50,26 @@
             return $stmt;
         }
 
+
+        function login($correo_usuario, $pass_usuario) {
+            // $user_pass = hash('sha256', $pass_usuario);
+            $hash_pass = hash('sha256',$pass_usuario);
+            $user_pass = md5($hash_pass);
+
+            $stmt = $this->conn->prepare('CALL loginUsuario(:correo_usuario, :pass_usuario)');
+            
+
+            $stmt->bindParam(':correo_usuario', $correo_usuario, PDO::PARAM_STR);
+            $stmt->bindParam(':pass_usuario', $user_pass, PDO::PARAM_STR);
+
+            // call the stored procedure
+            $stmt->execute();
+            return $stmt;
+
+        }
+
     }
 
 
 ?>
+

@@ -12,6 +12,10 @@
     
         // object properties
         public $id_anuncio;
+        public $id_agencia;
+        public $nombre_agencia;
+        public $pass_usuario;
+        public $correo_usuario;
 
 
         // constructor with $db as database connection
@@ -44,6 +48,27 @@
             // call the stored procedure
             $stmt->execute();
             return $stmt;
+        }
+
+
+
+        function login($nombre_agencia, $correo_usuario, $pass_usuario) {
+            // echo "login";
+            $hash_pass = hash('sha256',$pass_usuario);
+            $user_pass = md5($hash_pass);
+
+            // echo $user_pass;
+
+            $stmt = $this->conn->prepare('CALL loginAgencia(:nombre_agencia, :correo_usuario, :pass_usuario)');
+            
+            $stmt->bindParam(':nombre_agencia', $nombre_agencia, PDO::PARAM_STR);
+            $stmt->bindParam(':correo_usuario', $correo_usuario, PDO::PARAM_STR);
+            $stmt->bindParam(':pass_usuario', $user_pass, PDO::PARAM_STR);
+
+            // call the stored procedure
+            $stmt->execute();
+            return $stmt;
+
         }
 
 
