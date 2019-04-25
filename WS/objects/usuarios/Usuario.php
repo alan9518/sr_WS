@@ -11,10 +11,12 @@
         private $table_name = "usuarios";
     
         // object properties
-        public $id_usuatrio;
+        public $id_usuario;
         public $nombre_usuario;
-        public $pass_usuario;
+        public $apellidos_usuario;
         public $correo_usuario;
+        public $pass_usuario;
+        public $tel_usuario;
         
         public $id_anuncio;
 
@@ -68,8 +70,35 @@
 
         }
 
-    }
 
+        function addUser($usuario) {
+
+            $hash_pass = hash('sha256',$usuario->pass_usuario);
+            $user_pass = md5($hash_pass);
+
+            $stmt = $this->conn->prepare('CALL addUser(:nombre_usuario, :apellidos_usuario, :correo_usuario, :pass_usuario, :tel_usuario)');
+
+            $stmt->bindParam(':nombre_usuario', $usuario->nombre_usuario, PDO::PARAM_STR);
+            $stmt->bindParam(':apellidos_usuario', $usuario->apellidos_usuario, PDO::PARAM_STR);
+            $stmt->bindParam(':correo_usuario', $usuario->correo_usuario, PDO::PARAM_STR);
+            $stmt->bindParam(':pass_usuario', $user_pass, PDO::PARAM_STR);
+            $stmt->bindParam(':tel_usuario', $usuario->tel_usuario, PDO::PARAM_STR);
+
+            // call the stored procedure
+            // $stmt->execute();
+            // return $stmt;
+
+            // execute query
+            if($stmt->execute()){
+                $usuario->id_usuario = $this->conn->lastInsertId();
+                echo $usuario->id_usuario;
+                return true;
+            }
+            else
+                return false;
+        }
+
+    }
 
 ?>
 

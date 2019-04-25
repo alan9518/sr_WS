@@ -1,6 +1,6 @@
 <?php
     /* ==========================================================================
-    ** Get Anuncios Web Service
+    ** Get Anuncios Count for Paginatin Web Service
     ** 24/01/2019
     ** Alan Medina Silva
     ** ========================================================================== */
@@ -25,28 +25,20 @@
 
     // Get Varaibles
     // $currentPage = isset($_GET['page']) ? $_GET['page'] : die();
-    // $itemsPerPage = isset($_GET['items']) ? $_GET['items'] : die();
-    $itemsPerPage = 6;
-    // $sortByOption = isset($_GET['sortBy']) ? $_GET['sortBy'] : die();
 
     // echo $currentPage;
 
     // read the details of user to be edited
-    // $stmt = $anuncios->getAnunciosPagination($currentPage, $itemsPerPage, $sortByOption);
+    $stmt = $anuncios->getAnunciosCount();
 
+    if ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+        $anunciosCount = $row['count'];
 
-
-    $stmt = $anuncios->	testOptional('auto', 'acura', null, null, 0, 500);
-
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-        // echo $row;
-        $resultsArray[] = $row;
+        // Make JSON Format
+        echo (json_encode($row));
     }
-    
 
-    if(isset($resultsArray))
-        echo (json_encode($resultsArray));
-    else
-        echo (json_encode([]));
+
+  
 
 ?>

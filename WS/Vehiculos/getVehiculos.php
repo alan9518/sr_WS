@@ -1,6 +1,6 @@
 <?php
     /* ==========================================================================
-    ** Get Anuncio Details Web Service
+    ** Get Vehiculos Web Service
     ** 24/01/2019
     ** Alan Medina Silva
     ** ========================================================================== */
@@ -15,36 +15,30 @@
     // get database connection
     include_once '../config/database.php';    
     // instantiate user object
-    include_once '../objects/anuncios/Anuncios.php';
+    include_once '../objects/vehiculos/Vehiculo.php';
 
     
     $database = new Database();
     $db = $database->getConnection();
     
-    $anuncios = new Anuncios($db);
-
-    // Get Varaibles
-    $anuncios->id_anuncio = isset($_GET['id_anuncio']) ? $_GET['id_anuncio'] : die();
-
-    // echo $anuncios->id_anuncio;
-
-    // read the details of user to be edited
-    $stmt = $anuncios->getImagenesAnuncio($anuncios->id_anuncio);
-
-    // $stmt = $anuncios->getAll();
-
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-        
-        $resultsArray[] = $row;
-    }
+    $vehiculos = new Vehiculo($db);
 
     
-    if( isset($resultsArray)) {
-         // Make JSON Format
+
+    // Select Procedure
+        $stmt = $vehiculos->getAll();
+        
+        
+        // $stmt = $vehiculos->getAll();
+
+        // $resultsArray = $stmt->fetchall();
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            // echo $row;
+            $resultsArray[] = $row;
+        }
+
+    // Make JSON Format
         echo (json_encode($resultsArray));
-    }
-    else
-        echo (json_encode([]));
-   
 
 ?>

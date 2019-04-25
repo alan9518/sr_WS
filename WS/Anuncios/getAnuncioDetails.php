@@ -34,6 +34,7 @@
     // $stmt = $anuncios->getAll();
 
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+        // echo (json_encode($row));
         $resultsArray = $row;
     }
 

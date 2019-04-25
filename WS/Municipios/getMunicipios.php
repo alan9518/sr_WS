@@ -1,6 +1,6 @@
 <?php
     /* ==========================================================================
-    ** Get Anuncios Web Service
+    ** Get Municipios Web Service
     ** 24/01/2019
     ** Alan Medina Silva
     ** ========================================================================== */
@@ -15,38 +15,33 @@
     // get database connection
     include_once '../config/database.php';    
     // instantiate user object
-    include_once '../objects/anuncios/Anuncios.php';
+    include_once '../objects/municipio/Municipio.php';
 
     
     $database = new Database();
     $db = $database->getConnection();
     
-    $anuncios = new Anuncios($db);
+    $municipios = new Municipio($db);
 
     // Get Varaibles
-    // $currentPage = isset($_GET['page']) ? $_GET['page'] : die();
-    // $itemsPerPage = isset($_GET['items']) ? $_GET['items'] : die();
-    $itemsPerPage = 6;
-    // $sortByOption = isset($_GET['sortBy']) ? $_GET['sortBy'] : die();
+        $estado_id = isset($_GET['id_estado']) ? $_GET['id_estado'] : die();
 
-    // echo $currentPage;
+    // echo $estado_id;
 
     // read the details of user to be edited
-    // $stmt = $anuncios->getAnunciosPagination($currentPage, $itemsPerPage, $sortByOption);
+        $stmt = $municipios->getMunicipiosByEstado($estado_id);
+        
+        
+        // $stmt = $municipios->getAll();
 
+        // $resultsArray = $stmt->fetchall();
 
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            // echo $row;
+            $resultsArray[] = $row;
+        }
 
-    $stmt = $anuncios->	testOptional('auto', 'acura', null, null, 0, 500);
-
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-        // echo $row;
-        $resultsArray[] = $row;
-    }
-    
-
-    if(isset($resultsArray))
+    // Make JSON Format
         echo (json_encode($resultsArray));
-    else
-        echo (json_encode([]));
 
 ?>

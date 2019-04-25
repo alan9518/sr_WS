@@ -1,6 +1,6 @@
 <?php
     /* ==========================================================================
-    ** Get Anuncios Web Service
+    ** Get Related Anuncios Web Service
     ** 24/01/2019
     ** Alan Medina Silva
     ** ========================================================================== */
@@ -24,29 +24,19 @@
     $anuncios = new Anuncios($db);
 
     // Get Varaibles
-    // $currentPage = isset($_GET['page']) ? $_GET['page'] : die();
-    // $itemsPerPage = isset($_GET['items']) ? $_GET['items'] : die();
-    $itemsPerPage = 6;
-    // $sortByOption = isset($_GET['sortBy']) ? $_GET['sortBy'] : die();
-
-    // echo $currentPage;
-
+    $relatedMarca = isset($_GET['relatedMarca']) ? $_GET['relatedMarca'] : die();
+   
     // read the details of user to be edited
-    // $stmt = $anuncios->getAnunciosPagination($currentPage, $itemsPerPage, $sortByOption);
-
-
-
-    $stmt = $anuncios->	testOptional('auto', 'acura', null, null, 0, 500);
+    $stmt = $anuncios->getRelatedAnunciosByMarca($relatedMarca);
 
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
         // echo $row;
         $resultsArray[] = $row;
     }
-    
 
-    if(isset($resultsArray))
+    // Make JSON Format
+    if(isset($resultsArray)) 
         echo (json_encode($resultsArray));
     else
         echo (json_encode([]));
-
 ?>
