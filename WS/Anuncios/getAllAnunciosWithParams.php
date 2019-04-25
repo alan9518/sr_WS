@@ -42,11 +42,16 @@
     // Set Query to use
     if($tipo !== 'nan'  && $marca !== 'nan'  && $modelo !== 'nan'   && $ubicacion !== 'nan' && $precioBase !== 'nan' && $precioTope !== 'nan' ) {
         $stmt = $anuncios->getAnunciosPaginationWithAllParams($tipo, $marca, $modelo, $ubicacion, $precioBase, $precioTope, $currentPage, $itemsPerPage, $sortByOption);
+
     }
-    else 
+    else if($tipo == 'nan'  && $marca == 'nan'  && $modelo == 'nan'   && $ubicacion == 'nan' && $precioBase == 'nan' && $precioTope == 'nan' ) {
         $stmt = $anuncios->getAnunciosPagination($currentPage, $itemsPerPage, $sortByOption);
+    }
+    else
+        $stmt = $anuncios->getAnunciosPaginationOptParams($tipo, $marca, $modelo, $ubicacion, $precioBase, $precioTope, $currentPage, $itemsPerPage, $sortByOption);
 
-
+    
+    // Iterate Results
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
         
         $resultsArray[] = $row;

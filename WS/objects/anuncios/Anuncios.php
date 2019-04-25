@@ -70,14 +70,14 @@ ini_set("display_errors", 1);
 
 
 
-         // --------------------------------------
+        // --------------------------------------
         // GET Anuncios Count With Pagination &&
         // All Params
         // --------------------------------------
         function getAnunciosCountWithAllParams($tipo, $modelo, $marca, $ubicacion, $precioBase, $precioTope) {
             // Define Pagination settings
-                $results_per_page = $itemsPerPage;
-                $start_from = ($currentPage-1) * $results_per_page;
+                // $results_per_page = $itemsPerPage;
+                // $start_from = ($currentPage-1) * $results_per_page;
 
             // Set SP
 
@@ -109,6 +109,70 @@ ini_set("display_errors", 1);
                
          
             return $stmt;
+        }
+
+
+
+        // --------------------------------------
+        // GET Anuncios Count With Pagination &&
+        // OPtional  Params
+        // http://localhost:8080/SR_seminuevos/backendFinal/WS/Anuncios/getAllAnunciosWithParams.php?tipo=nan&marca=Cadillac&modelo=nan&ubicacion=nan&precioBase=nan&precioTope=nan&page=1&items=6&sortBy=highDate
+        // http://localhost:8080/SR_seminuevos/backendFinal/WS/Anuncios/getAnunciosCountAllParams.php?tipo=nan&marca=Cadillac&modelo=nan&ubicacion=nan&precioBase=nan&precioTope=nan
+        // --------------------------------------
+        function getAnunciosCountOptParams($tipo, $marca, $modelo, $estado, $precioBase, $precioTope) {
+            
+           
+            // if Data has nan transform to null
+
+            
+            if($marca == 'nan') 
+                $marca = null;
+            if($modelo == 'nan') 
+                $modelo = null;
+            if($marca == 'nan') 
+                $marca = null;
+            if($estado == 'nan') 
+                $estado = null;
+            if($precioBase == 'nan') 
+                $precioBase = null;
+            if($precioTope == 'nan') 
+                $precioTope = null;
+
+
+
+              // set Tipo Value
+                if($tipo === 'Autos')
+                    $tipoValue = 'auto';
+                else if($tipo == 'nan') 
+                    $tipoValue = null;
+                else if($tipo === 'motos')
+                    $tipoValue = 'moto';
+                else
+                    $tipoValue = 'clasico';
+            
+
+         
+            // Call Stored Procedure
+
+            // echo $precioBase;
+
+            $stmt = $this->conn->prepare("CALL getAnunciosCountWithOptionalParams(:tipo, :marca, :modelo, :estado, :precioBase, :precioTope)");
+            $stmt->bindParam(':tipo', $tipoValue, PDO::PARAM_STR);
+            $stmt->bindParam(':marca', $marca, PDO::PARAM_STR);
+            $stmt->bindParam(':modelo', $modelo, PDO::PARAM_STR);
+            $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
+            $stmt->bindParam(':precioBase', $precioBase, PDO::PARAM_STR);
+            $stmt->bindParam(':precioTope', $precioTope, PDO::PARAM_STR);
+            
+
+
+            // var_dump($stmt);
+             // call the stored procedure
+                $stmt->execute();
+
+               
+         
+             return $stmt;
         }
 
 
@@ -269,6 +333,99 @@ ini_set("display_errors", 1);
         }
 
 
+        // --------------------------------------
+        // GET All Anuncios With Pagination
+        // --------------------------------------
+        function getAnunciosPaginationOptParams($tipo, $marca, $modelo, $estado, $precioBase, $precioTope, $currentPage, $itemsPerPage, $sortByOption) {
+
+
+            // if Data has nan transform to null
+
+            
+            if($marca == 'nan') 
+                $marca = null;
+            if($modelo == 'nan') 
+                $modelo = null;
+            if($marca == 'nan') 
+                $marca = null;
+            if($estado == 'nan') 
+                $estado = null;
+            if($precioBase == 'nan') 
+                $precioBase = null;
+            if($precioTope == 'nan') 
+                $precioTope = null;
+
+
+
+              // set Tipo Value
+                if($tipo === 'Autos')
+                    $tipoValue = 'auto';
+                else if($tipo == 'nan') 
+                    $tipoValue = null;
+                else if($tipo === 'motos')
+                    $tipoValue = 'moto';
+                else
+                    $tipoValue = 'clasico';
+            
+
+            // Define Pagination settings
+                $results_per_page = $itemsPerPage;
+                $start_from = ($currentPage-1) * $results_per_page;
+
+                // echo $start_from;
+
+            // Define OrderBy Filter
+
+
+                // switch($sortByOption) {
+                //     case  'lowPrice' : 
+                //     // echo $sortByOption;
+                //             $stmt = $this->conn->prepare("CALL getAnunciosWithOptionalParams(:tipo, :marca, :modelo, :estado, :precioBase, :precioTope, :startPage, :endPage, :sortBy)");
+                //                 $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
+                //                 $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
+                //             break;
+                //     case  'HighPrice' : 
+                //     // echo $sortByOption;
+                //             $stmt = $this->conn->prepare("CALL getAnunciosByHighPrice(:startPage,:endPage)");
+                //                 $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
+                //                 $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
+                //             break;
+                //     default : 
+                //         // echo $results_per_page;
+                //         $stmt = $this->conn->prepare("CALL getAnunciosPag(:startPage, :endPage, :sortBy)");
+                //             $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
+                //             $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
+                //             $stmt->bindParam(':sortBy', $sortByOption, PDO::PARAM_STR);
+              
+                // }
+
+         
+            // Call Stored Procedure
+
+            // echo $precioBase;
+
+            $stmt = $this->conn->prepare("CALL getAnunciosWithOptionalParams(:tipo, :marca, :modelo, :estado, :precioBase, :precioTope, :startPage, :endPage, :sortBy)");
+            $stmt->bindParam(':tipo', $tipoValue, PDO::PARAM_STR);
+            $stmt->bindParam(':marca', $marca, PDO::PARAM_STR);
+            $stmt->bindParam(':modelo', $modelo, PDO::PARAM_STR);
+            $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
+            $stmt->bindParam(':precioBase', $precioBase, PDO::PARAM_STR);
+            $stmt->bindParam(':precioTope', $precioTope, PDO::PARAM_STR);
+            $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
+            $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
+            $stmt->bindParam(':sortBy', $sortByOption, PDO::PARAM_STR);
+
+
+            // var_dump($stmt);
+             // call the stored procedure
+                $stmt->execute();
+
+                
+         
+             return $stmt;
+        }
+
+
 
 
     /* ==========================================================================
@@ -344,66 +501,7 @@ ini_set("display_errors", 1);
 
 
 
-         // --------------------------------------
-        // GET All Anuncios With Pagination
-        // --------------------------------------
-        function testOptional($tipo, $marca, $modelo, $estado, $precioBase, $precioTope) {
-
-            // echo "tipo";
-
-            // Define Pagination settings
-                // $results_per_page = $itemsPerPage;
-                // $start_from = ($currentPage-1) * $results_per_page;
-
-                // echo $start_from;
-
-            // Define OrderBy Filter
-
-
-                // switch($sortByOption) {
-                //     case  'lowPrice' : 
-                //     // echo $sortByOption;
-                //             $stmt = $this->conn->prepare("CALL getAnunciosByLowPrice(:startPage,:endPage)");
-                //                 $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
-                //                 $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
-                //             break;
-                //     case  'HighPrice' : 
-                //     // echo $sortByOption;
-                //             $stmt = $this->conn->prepare("CALL getAnunciosByHighPrice(:startPage,:endPage)");
-                //                 $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
-                //                 $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
-                //             break;
-                //     default : 
-                //         // echo $results_per_page;
-                //         $stmt = $this->conn->prepare("CALL getAnunciosPag(:startPage, :endPage, :sortBy)");
-                //             $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
-                //             $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
-                //             $stmt->bindParam(':sortBy', $sortByOption, PDO::PARAM_STR);
-              
-                // }
-
-         
-            // Call Stored Procedure
-
-            // echo $precioBase;
-
-            $stmt = $this->conn->prepare("CALL testOptional(:tipo, :marca, :modelo, :estado, :precioBase, :precioTope)");
-            $stmt->bindParam(':tipo', $tipo, PDO::PARAM_STR);
-            $stmt->bindParam(':marca', $marca, PDO::PARAM_STR);
-            $stmt->bindParam(':modelo', $modelo, PDO::PARAM_STR);
-            $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
-            $stmt->bindParam(':precioBase', $precioBase, PDO::PARAM_STR);
-            $stmt->bindParam(':precioTope', $precioTope, PDO::PARAM_STR);
-
-
-            // var_dump($stmt);
-             // call the stored procedure
-                $stmt->execute();
-
-                // var_dump($stmt);
-         
-             return $stmt;
-        }
+       
 
         
 

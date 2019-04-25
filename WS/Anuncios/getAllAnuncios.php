@@ -24,19 +24,19 @@
     $anuncios = new Anuncios($db);
 
     // Get Varaibles
-    // $currentPage = isset($_GET['page']) ? $_GET['page'] : die();
-    // $itemsPerPage = isset($_GET['items']) ? $_GET['items'] : die();
+    $currentPage = isset($_GET['page']) ? $_GET['page'] : die();
+    $itemsPerPage = isset($_GET['items']) ? $_GET['items'] : die();
     $itemsPerPage = 6;
-    // $sortByOption = isset($_GET['sortBy']) ? $_GET['sortBy'] : die();
+    $sortByOption = isset($_GET['sortBy']) ? $_GET['sortBy'] : die();
 
     // echo $currentPage;
 
     // read the details of user to be edited
-    // $stmt = $anuncios->getAnunciosPagination($currentPage, $itemsPerPage, $sortByOption);
+    $stmt = $anuncios->getAnunciosPagination($currentPage, $itemsPerPage, $sortByOption);
 
 
 
-    $stmt = $anuncios->	testOptional('auto', 'acura', null, null, 0, 500);
+    // $stmt = $anuncios->	getAnunciosWithOptionalParams(null, null, null, null, 0, 100000000, 1, 6, 'tituloDesc');
 
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
         // echo $row;

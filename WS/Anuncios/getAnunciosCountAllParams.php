@@ -24,9 +24,9 @@
     $anuncios = new Anuncios($db);
 
     // Get Pagination Varaibles
-    $currentPage = isset($_GET['page']) ? $_GET['page'] : die();
-    $itemsPerPage = 6;
-    $sortByOption = isset($_GET['sortBy']) ? $_GET['sortBy'] : die();
+    // $currentPage = isset($_GET['page']) ? $_GET['page'] : die();
+    // $itemsPerPage = 6;
+    // $sortByOption = isset($_GET['sortBy']) ? $_GET['sortBy'] : die();
 
     // Get Query Variables
     $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : die();
@@ -43,25 +43,57 @@
     // ?--------------------------------------
 
         //  All Params
+        // if($tipo !== 'nan'  && $marca !== 'nan'  && $modelo !== 'nan'   && $ubicacion !== 'nan' && $precioBase !== 'nan' && $precioTope !== 'nan' ) {
+        //     $stmt = $anuncios->getAnunciosCountWithAllParams($tipo, $marca, $modelo, $ubicacion, $precioBase, $precioTope);
+        // }
+
+
         if($tipo !== 'nan'  && $marca !== 'nan'  && $modelo !== 'nan'   && $ubicacion !== 'nan' && $precioBase !== 'nan' && $precioTope !== 'nan' ) {
             $stmt = $anuncios->getAnunciosCountWithAllParams($tipo, $marca, $modelo, $ubicacion, $precioBase, $precioTope);
+
+            
+            $queryResult = $stmt->fetchAll();
+            $num_rows = count($queryResult);
+            
+
+            $resultsArray = array();
+            $resultsArray['count'] =  $num_rows;
+
+            echo (json_encode($resultsArray));
+    
         }
+        else if($tipo == 'nan'  && $marca == 'nan'  && $modelo == 'nan'   && $ubicacion == 'nan' && $precioBase == 'nan' && $precioTope == 'nan' ) {
+            $stmt = $anuncios->getAnunciosCount();
+                    
+            $queryResult = $stmt->fetchAll();
+            $num_rows = count($queryResult);
+            
+
+            $resultsArray = array();
+            $resultsArray['count'] =  $num_rows;
+
+            echo (json_encode($resultsArray));
+        }
+        else {
+            $stmt = $anuncios->getAnunciosCountOptParams($tipo, $marca, $modelo, $ubicacion, $precioBase, $precioTope);
+
+            $count = $stmt->rowCount();
+            
+            $resultsArray = array();
+            $resultsArray['count'] =  $count;
+
+            echo (json_encode($resultsArray));
+
+
+        }
+            
+    
+        // var_dump($stmt);
         
   
 
-    // if ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-        
-    //     $resultsArray[] = $row;
-    // }
 
-    $queryResult = $stmt->fetchAll();
-    $num_rows = count($queryResult);
-    
 
-    $resultsArray = array();
-    $resultsArray['count'] =  $num_rows;
-
-    echo (json_encode($resultsArray));
 
 
 
