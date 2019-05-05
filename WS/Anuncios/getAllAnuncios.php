@@ -26,7 +26,7 @@
     // Get Varaibles
     $currentPage = isset($_GET['page']) ? $_GET['page'] : die();
     $itemsPerPage = isset($_GET['items']) ? $_GET['items'] : die();
-    $itemsPerPage = 6;
+    // $itemsPerPage = 12;
     $sortByOption = isset($_GET['sortBy']) ? $_GET['sortBy'] : die();
 
     // echo $currentPage;

@@ -36,6 +36,18 @@
 
 
 
+        function getEstadosWithAnuncios() {
+            $stmt = $this->conn->prepare('CALL getEstadosWithAnuncios()');
+            
+
+
+            // call the stored procedure
+            $stmt->execute();
+            return $stmt;
+        }
+
+
+
 
     }
 

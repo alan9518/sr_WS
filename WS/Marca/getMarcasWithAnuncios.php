@@ -1,10 +1,11 @@
 <?php
     /* ==========================================================================
-    ** Get Anuncio Details Web Service
+    ** Get Marcas Web Service
     ** 24/01/2019
     ** Alan Medina Silva
     ** ========================================================================== */
-    
+    //header('Access-Control-Allow-Origin: *');
+    //header('Content-Type: application/json');
     
     header("Access-Control-Allow-Origin: *");
 	header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
@@ -15,34 +16,28 @@
     // get database connection
     include_once '../config/database.php';    
     // instantiate user object
-    include_once '../objects/anuncios/Anuncios.php';
+    include_once '../objects/marca/Marca.php';
 
     
     $database = new Database();
     $db = $database->getConnection();
     
-    $anuncios = new Anuncios($db);
-
-    // Get Varaibles
-    $anuncios->id_anuncio = isset($_GET['id_anuncio']) ? $_GET['id_anuncio'] : die();
-    $editAnuncio =  isset($_GET['edit_anuncio']) ? $_GET['edit_anuncio'] : false;
-    // echo $anuncios->id_anuncio;
+    $marca = new Marca($db);
 
     // read the details of user to be edited
-
-    if($editAnuncio == true) 
-        $stmt = $anuncios->getAnuncioDetailsEdit($anuncios->id_anuncio);
-    else
-        $stmt = $anuncios->getAnuncioDetails($anuncios->id_anuncio);
-
-    // $stmt = $anuncios->getAll();
+    $stmt = $marca->getMarcasWithAnuncios();
 
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-        // echo (json_encode($row));
-        $resultsArray = $row;
+        // echo $row;
+        $resultsArray[] = $row;
     }
+    
 
-    // Make JSON Format
-    echo (json_encode($resultsArray));
+    if(isset($resultsArray))
+        echo (json_encode($resultsArray));
+    else
+        echo (json_encode([]));
 
+  // Make JSON Format
+  
 ?>

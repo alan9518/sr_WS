@@ -37,6 +37,16 @@
 
 
 
+        function getMarcasWithAnuncios() {
+            $stmt = $this->conn->prepare('CALL getMarcasWithAnuncios()');
+            // call the stored procedure
+            $stmt->execute();
+            return $stmt;
+        }
+
+
+
+
     }
 
 

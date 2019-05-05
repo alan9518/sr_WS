@@ -35,7 +35,7 @@
     // echo ("usuario");
 
 
-    echo json_encode($usuario);
+    // echo json_encode($usuario);
 
     // read the details of user to be edited
     $stmt = $usuario->addUser($usuario);

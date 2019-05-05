@@ -1,6 +1,6 @@
 <?php
     /* ==========================================================================
-    ** Get Anuncio Details Web Service
+    ** Get Anuncios Count for Paginatin Web Service
     ** 24/01/2019
     ** Alan Medina Silva
     ** ========================================================================== */
@@ -24,25 +24,25 @@
     $anuncios = new Anuncios($db);
 
     // Get Varaibles
-    $anuncios->id_anuncio = isset($_GET['id_anuncio']) ? $_GET['id_anuncio'] : die();
-    $editAnuncio =  isset($_GET['edit_anuncio']) ? $_GET['edit_anuncio'] : false;
-    // echo $anuncios->id_anuncio;
+    $searchCat = isset($_GET['searchCat']) ? $_GET['searchCat'] : die();
+    $correo_usuario =  isset($_GET['correo_usuario']) ? $_GET['correo_usuario'] : die();
+
+    // echo $currentPage;
 
     // read the details of user to be edited
+    $stmt = $anuncios->getAnunciosCountByuser($searchCat, $correo_usuario);
 
-    if($editAnuncio == true) 
-        $stmt = $anuncios->getAnuncioDetailsEdit($anuncios->id_anuncio);
-    else
-        $stmt = $anuncios->getAnuncioDetails($anuncios->id_anuncio);
+    if ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+        $anunciosCount = $row;
 
-    // $stmt = $anuncios->getAll();
-
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-        // echo (json_encode($row));
-        $resultsArray = $row;
+        // Make JSON Format
+        echo (json_encode($row));
     }
+    else 
+        echo (json_encode([]));
+  
 
-    // Make JSON Format
-    echo (json_encode($resultsArray));
+
+  
 
 ?>

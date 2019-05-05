@@ -55,20 +55,25 @@
 
     // echo json_encode($anuncio);
 
-  
-    if($anuncio->createAnuncio($anuncio)){
+
+    $lastAnuncio = $anuncio->createAnuncio($anuncio);
+
+    if($lastAnuncio > 0) {
         $response=array(
             "status" => true,
-            "message" => "Anuncio creado"
-            
+            "message" => "Anuncio creado",
+            "last_Anuncio"=>  $lastAnuncio
         );
     }
-    else{
+    else {
         $response=array(
             "status" => false,
-            "message" => "error al crear el anuncio"
+            "message" => "error al crear el anuncio",
+            "last_Anuncio"=>  0
         );
     }
+
+  
 
     print_r(json_encode($response));
 

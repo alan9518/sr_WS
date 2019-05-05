@@ -53,7 +53,7 @@
 
             $response=array(
                 "status" => "sucess",
-                "url" => $target_file
+                "url" => $filename
             );
         
 

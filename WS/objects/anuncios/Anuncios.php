@@ -33,6 +33,7 @@ ini_set("display_errors", 1);
         public $anuncio_pagado;
         public $precio_anuncio_pagado;
         public $metodo_pago;
+        public $imagen_anuncio;
 
         // constructor with $db as database connection
         public function __construct($db){
@@ -227,6 +228,166 @@ ini_set("display_errors", 1);
         }
 
 
+        
+        // --------------------------------------
+        // GET All Anuncios With Pagination BY User
+        // --------------------------------------
+        function getAnunciosByuser($searchCat, $correo_usuario, $currentPage, $itemsPerPage) {
+            // Define Pagination settings
+                $results_per_page = $itemsPerPage;
+                $start_from = ($currentPage-1) * $results_per_page;
+
+                
+
+                $stmt = $this->conn->prepare("CALL getAnunciosByUser(:searchCat, :mailToSearch,  :startPage, :endPage)");
+                $stmt->bindParam(':searchCat', $searchCat, PDO::PARAM_STR);  
+                $stmt->bindParam(':mailToSearch', $correo_usuario, PDO::PARAM_STR);
+                $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
+                $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
+                            
+
+         
+            // Call Stored Procedure
+         
+
+             // call the stored procedure
+                $stmt->execute();
+
+                // var_dump($stmt);
+         
+             return $stmt;
+        }
+
+
+        // --------------------------------------
+        // GET All Anuncios With Pagination BY User
+        // --------------------------------------
+        function getAnunciosCountByuser($searchCat, $correo_usuario) {
+            
+
+                
+
+                $stmt = $this->conn->prepare("CALL getAnuciosCountByUser(:searchCat, :mailToSearch)");
+                $stmt->bindParam(':searchCat', $searchCat, PDO::PARAM_STR);  
+                $stmt->bindParam(':mailToSearch', $correo_usuario, PDO::PARAM_STR);
+               
+                            
+
+         
+            // Call Stored Procedure
+         
+
+             // call the stored procedure
+                $stmt->execute();
+
+                // var_dump($stmt);
+         
+             return $stmt;
+        }
+
+
+
+
+       
+        // --------------------------------------
+        // GET Anuncios With Estado Filter
+        // --------------------------------------
+        function getAnunciosWithEstadoFilterAndNoParams($estadosFilter, $marcasFilter, $startYearFilter, $endYearFilter,  $currentPage, $itemsPerPage, $sortByOption) {
+
+             // Define Pagination settings
+                $results_per_page = $itemsPerPage;
+                $start_from = ($currentPage-1) * $results_per_page;
+                $sortedQuery = '';
+                $whereClause = '';
+
+            // set Where clause 
+                if($estadosFilter !== '' && $marcasFilter !== '' ) {
+                    $whereClause = $estadosFilter." AND ". $marcasFilter. " AND vehiculos.year >= {$startYearFilter} AND vehiculos.year <= {$endYearFilter} " ;
+
+                    // echo $whereClause;
+                }
+                else if($estadosFilter === '' && $marcasFilter !== '') {
+                    $whereClause = $marcasFilter. " AND vehiculos.year >= {$startYearFilter} AND vehiculos.year <= {$endYearFilter} " ;
+                }
+
+                else if($estadosFilter !== '' && $marcasFilter == '') {
+                    $whereClause = $estadosFilter. " AND vehiculos.year >= {$startYearFilter} AND vehiculos.year <= {$endYearFilter} " ;
+                }
+                else if($estadosFilter == '' && $marcasFilter == '' && $startYearFilter > 0 && $endYearFilter > 0) {
+                    $whereClause = "vehiculos.year >= {$startYearFilter} AND vehiculos.year <= {$endYearFilter} " ;
+
+                }
+
+               
+
+            // Set Query
+                
+                $query = " SELECT anuncios.id as 'id_anuncio', 
+                            anuncios.titulo, 
+                            tipo_anuncio.tipo_anuncio,
+                            anuncios.Descripcion as shortDescription,
+                            anuncios.imagen_destacada,
+                            anuncios.precio,
+                            vehiculos.id,
+                            vehiculos.year,
+                            vehiculos.kilometraje,
+                            vehiculos.equipamento,
+                            vehiculos.transmision,
+                            vehiculos.estilo_carroceria,
+                            anuncios.created_at
+                    FROM `anuncios` 
+                        INNER JOIN vehiculos 
+                            ON vehiculos.id =  anuncios.id_vehiculo
+                        INNER JOIN tipo_anuncio
+                            ON tipo_anuncio.id = anuncios.id_tipo_anuncio WHERE " .$whereClause."
+                        ORDER BY tipo_anuncio.prioridad";
+                   
+                   
+        // Sort Options
+                    switch($sortByOption) {
+                        case  'tituloAsc' : 
+                        // echo $sortByOption;
+                                $sortedQuery = $query.", anuncios.titulo LIMIT {$start_from}, {$results_per_page} ";
+                                   
+                                break;
+                        case  'highDate' : 
+                        // echo $sortByOption;
+                                $sortedQuery = $query.", anuncios.created_at LIMIT {$start_from}, {$results_per_page} ";
+                                break;
+
+                        case 'tituloDesc' : 
+                        // echo $sortByOption;
+                                $sortedQuery = $query.", anuncios.created_at DESC LIMIT {$start_from}, {$results_per_page} ";
+                                break;
+                        case  'lowPrice' : 
+                        // echo $sortByOption;
+                                $sortedQuery = $query.",  anuncios.precio ASC LIMIT {$start_from}, {$results_per_page} ";   
+                                break;
+                        case  'HighPrice' : 
+                        // echo $sortByOption;
+                                $sortedQuery = $query.",  anuncios.precio DESC LIMIT {$start_from}, {$results_per_page} ";   
+                        default : 
+                            $sortedQuery = $query.", anuncios.titulo LIMIT {$start_from}, {$results_per_page} ";
+                  
+                    }
+
+                   
+                 
+                // echo $sortedQuery;
+
+                // prepare query statement
+                $stmt = $this->conn->prepare($sortedQuery);
+                // // execute query
+                $stmt->execute();
+                return $stmt;
+
+
+                
+        }
+
+
+
+
 
         // --------------------------------------
         // GET All Anuncios Details
@@ -235,6 +396,25 @@ ini_set("display_errors", 1);
             // Call Stored Procedure
             $id = $id_anuncio;
             $stmt = $this->conn->prepare('CALL getAnuncioDetails(:id)');
+            // $stmt->bindParam(1, 1, PDO::PARAM_STR);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+
+            // call the stored procedure
+            $stmt->execute();
+            return $stmt;
+        }
+
+
+
+        
+        // --------------------------------------
+        // GET All Anuncios Details
+        // --------------------------------------
+        function getAnuncioDetailsEdit($id_anuncio) {
+            // Call Stored Procedure
+            $id = $id_anuncio;
+            $stmt = $this->conn->prepare('CALL getAnuncioDetailsEdit(:id)');
             // $stmt->bindParam(1, 1, PDO::PARAM_STR);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 
@@ -340,24 +520,22 @@ ini_set("display_errors", 1);
 
 
             // if Data has nan transform to null
-
-            
-            if($marca == 'nan') 
-                $marca = null;
-            if($modelo == 'nan') 
-                $modelo = null;
-            if($marca == 'nan') 
-                $marca = null;
-            if($estado == 'nan') 
-                $estado = null;
-            if($precioBase == 'nan') 
-                $precioBase = null;
-            if($precioTope == 'nan') 
-                $precioTope = null;
+                if($marca == 'nan') 
+                    $marca = null;
+                if($modelo == 'nan') 
+                    $modelo = null;
+                if($marca == 'nan') 
+                    $marca = null;
+                if($estado == 'nan') 
+                    $estado = null;
+                if($precioBase == 'nan') 
+                    $precioBase = null;
+                if($precioTope == 'nan') 
+                    $precioTope = null;
 
 
 
-              // set Tipo Value
+            // set Tipo Value
                 if($tipo === 'Autos')
                     $tipoValue = 'auto';
                 else if($tipo == 'nan') 
@@ -372,52 +550,60 @@ ini_set("display_errors", 1);
                 $results_per_page = $itemsPerPage;
                 $start_from = ($currentPage-1) * $results_per_page;
 
-                // echo $start_from;
+            
 
             // Define OrderBy Filter
 
 
-                // switch($sortByOption) {
-                //     case  'lowPrice' : 
-                //     // echo $sortByOption;
-                //             $stmt = $this->conn->prepare("CALL getAnunciosWithOptionalParams(:tipo, :marca, :modelo, :estado, :precioBase, :precioTope, :startPage, :endPage, :sortBy)");
-                //                 $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
-                //                 $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
-                //             break;
-                //     case  'HighPrice' : 
-                //     // echo $sortByOption;
-                //             $stmt = $this->conn->prepare("CALL getAnunciosByHighPrice(:startPage,:endPage)");
-                //                 $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
-                //                 $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
-                //             break;
-                //     default : 
-                //         // echo $results_per_page;
-                //         $stmt = $this->conn->prepare("CALL getAnunciosPag(:startPage, :endPage, :sortBy)");
-                //             $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
-                //             $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
-                //             $stmt->bindParam(':sortBy', $sortByOption, PDO::PARAM_STR);
+                switch($sortByOption) {
+                    case  'lowPrice' : 
+                    // echo $sortByOption;
+                            $stmt = $this->conn->prepare("CALL getAnunciosWithOptionalParamsLowPrice(:tipo, :marca, :modelo, :estado, :precioBase, :precioTope, :startPage, :endPage)");
+                                $stmt->bindParam(':tipo', $tipoValue, PDO::PARAM_STR);
+                                $stmt->bindParam(':marca', $marca, PDO::PARAM_STR);
+                                $stmt->bindParam(':modelo', $modelo, PDO::PARAM_STR);
+                                $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
+                                $stmt->bindParam(':precioBase', $precioBase, PDO::PARAM_STR);
+                                $stmt->bindParam(':precioTope', $precioTope, PDO::PARAM_STR);
+                                $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
+                                $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
+                                
+                            break;
+                    case  'HighPrice' : 
+                    // echo $sortByOption;
+                            $stmt = $this->conn->prepare("CALL getAnunciosWithOptionalParamsHighPrice(:tipo, :marca, :modelo, :estado, :precioBase, :precioTope, :startPage, :endPage)");
+                            $stmt->bindParam(':tipo', $tipoValue, PDO::PARAM_STR);
+                            $stmt->bindParam(':marca', $marca, PDO::PARAM_STR);
+                            $stmt->bindParam(':modelo', $modelo, PDO::PARAM_STR);
+                            $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
+                            $stmt->bindParam(':precioBase', $precioBase, PDO::PARAM_STR);
+                            $stmt->bindParam(':precioTope', $precioTope, PDO::PARAM_STR);
+                            $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
+                            $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
+                            break;
+                    default : 
+                            $stmt = $this->conn->prepare("CALL getAnunciosWithOptionalParams(:tipo, :marca, :modelo, :estado, :precioBase, :precioTope, :startPage, :endPage, :sortBy)");
+                            $stmt->bindParam(':tipo', $tipoValue, PDO::PARAM_STR);
+                            $stmt->bindParam(':marca', $marca, PDO::PARAM_STR);
+                            $stmt->bindParam(':modelo', $modelo, PDO::PARAM_STR);
+                            $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
+                            $stmt->bindParam(':precioBase', $precioBase, PDO::PARAM_STR);
+                            $stmt->bindParam(':precioTope', $precioTope, PDO::PARAM_STR);
+                            $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
+                            $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
+                            $stmt->bindParam(':sortBy', $sortByOption, PDO::PARAM_STR);
+        
+                        // echo $results_per_page;
+                            // $stmt = $this->conn->prepare("CALL getAnunciosPag(:startPage, :endPage, :sortBy)");
+                            // $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
+                            // $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
+                            // $stmt->bindParam(':sortBy', $sortByOption, PDO::PARAM_STR);
               
-                // }
+                }
 
          
-            // Call Stored Procedure
-
-            // echo $precioBase;
-
-            $stmt = $this->conn->prepare("CALL getAnunciosWithOptionalParams(:tipo, :marca, :modelo, :estado, :precioBase, :precioTope, :startPage, :endPage, :sortBy)");
-            $stmt->bindParam(':tipo', $tipoValue, PDO::PARAM_STR);
-            $stmt->bindParam(':marca', $marca, PDO::PARAM_STR);
-            $stmt->bindParam(':modelo', $modelo, PDO::PARAM_STR);
-            $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
-            $stmt->bindParam(':precioBase', $precioBase, PDO::PARAM_STR);
-            $stmt->bindParam(':precioTope', $precioTope, PDO::PARAM_STR);
-            $stmt->bindParam(':startPage', $start_from, PDO::PARAM_INT);
-            $stmt->bindParam(':endPage', $results_per_page, PDO::PARAM_INT);
-            $stmt->bindParam(':sortBy', $sortByOption, PDO::PARAM_STR);
-
-
-            // var_dump($stmt);
-             // call the stored procedure
+          
+            // call the stored procedure
                 $stmt->execute();
 
                 
@@ -467,19 +653,79 @@ ini_set("display_errors", 1);
 
 
             if($stmt->execute()){
-                // $usuario->id_usuario = $this->conn->lastInsertId();
-                // echo $usuario->id_usuario;
-                // print_r(var_dump($stmt));
+                
+
+                $get_stmt = $this->conn->prepare("CALL getLastAnuncio()");
+            
+                $get_stmt->execute();
+        
+
+                $lastAnuncio = $get_stmt->fetch(PDO::FETCH_ASSOC);
+
+        
+                // echo (json_encode($lastAnuncio));
+        
+
+                return $lastAnuncio;
+
+
+                // return true;
+            }
+            else
+                return 0;
+        }
+
+
+
+        
+        // --------------------------------------
+        // Create new Anuncio
+        // --------------------------------------
+
+        function saveImage($anuncio) {
+            // echo (json_encode($anuncio));
+
+
+            $stmt = $this->conn->prepare('CALL saveAnuncioImages(:id_anuncio, :ruta_imagen)');
+                                            
+            $stmt->bindParam(':id_anuncio', $anuncio->id_anuncio, PDO::PARAM_INT);
+            $stmt->bindParam(':ruta_imagen', $anuncio->imagen_anuncio, PDO::PARAM_STR);
+
+            
+
+
+            if($stmt->execute()){
+                
+
+                // $get_stmt = $this->conn->prepare("CALL saveAnuncioImages(:id_anuncio, :ruta_imagen)");
+            
+                // $get_stmt->execute();
+        
+
+                // $lastAnuncio = $get_stmt->fetch(PDO::FETCH_ASSOC);
+
+        
+                // // echo (json_encode($lastAnuncio));
+        
+
+                // return $lastAnuncio;
+
+
                 return true;
             }
-            else {
-                // echo $stmt->error;
-
-                // print_r(var_dump($stmt));
+            else
                 return false;
-            }
-                
         }
+
+          
+                
+    }
+
+
+    
+          
+                
+    
 
 
 
@@ -506,7 +752,7 @@ ini_set("display_errors", 1);
         
 
 
-    }
+    
 
 
 ?>

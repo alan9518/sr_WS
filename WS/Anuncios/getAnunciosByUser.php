@@ -1,6 +1,6 @@
 <?php
     /* ==========================================================================
-    ** Get Anuncio Details Web Service
+    ** Get Anuncios By User or Agencia IDWeb Service
     ** 24/01/2019
     ** Alan Medina Silva
     ** ========================================================================== */
@@ -24,25 +24,28 @@
     $anuncios = new Anuncios($db);
 
     // Get Varaibles
-    $anuncios->id_anuncio = isset($_GET['id_anuncio']) ? $_GET['id_anuncio'] : die();
-    $editAnuncio =  isset($_GET['edit_anuncio']) ? $_GET['edit_anuncio'] : false;
-    // echo $anuncios->id_anuncio;
+    $searchCat = isset($_GET['searchCat']) ? $_GET['searchCat'] : die();
+    $correo_usuario =  isset($_GET['correo_usuario']) ? $_GET['correo_usuario'] : die();
+    $currentPage = isset($_GET['page']) ? $_GET['page'] : die();
+    $itemsPerPage = isset($_GET['items']) ? $_GET['items'] : die();
+    // $itemsPerPage = 10;
+    
 
     // read the details of user to be edited
+    $stmt = $anuncios->getAnunciosByuser($searchCat, $correo_usuario, $currentPage, $itemsPerPage);
 
-    if($editAnuncio == true) 
-        $stmt = $anuncios->getAnuncioDetailsEdit($anuncios->id_anuncio);
-    else
-        $stmt = $anuncios->getAnuncioDetails($anuncios->id_anuncio);
 
-    // $stmt = $anuncios->getAll();
+
+    // $stmt = $anuncios->	getAnunciosWithOptionalParams(null, null, null, null, 0, 100000000, 1, 6, 'tituloDesc');
 
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-        // echo (json_encode($row));
-        $resultsArray = $row;
+        $resultsArray[] = $row;
     }
+    
 
-    // Make JSON Format
-    echo (json_encode($resultsArray));
+    if(isset($resultsArray))
+        echo (json_encode($resultsArray));
+    else
+        echo (json_encode([]));
 
 ?>

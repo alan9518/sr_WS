@@ -25,7 +25,8 @@
 
     // Get Pagination Varaibles
     $currentPage = isset($_GET['page']) ? $_GET['page'] : die();
-    $itemsPerPage = 6;
+    $itemsPerPage = isset($_GET['items']) ? $_GET['items'] : die();
+    // $itemsPerPage = 12;
     $sortByOption = isset($_GET['sortBy']) ? $_GET['sortBy'] : die();
 
     // Get Query Variables
@@ -40,17 +41,21 @@
   
 
     // Set Query to use
+    // ALl params
     if($tipo !== 'nan'  && $marca !== 'nan'  && $modelo !== 'nan'   && $ubicacion !== 'nan' && $precioBase !== 'nan' && $precioTope !== 'nan' ) {
         $stmt = $anuncios->getAnunciosPaginationWithAllParams($tipo, $marca, $modelo, $ubicacion, $precioBase, $precioTope, $currentPage, $itemsPerPage, $sortByOption);
 
     }
+    // All Anuncios No Params
     else if($tipo == 'nan'  && $marca == 'nan'  && $modelo == 'nan'   && $ubicacion == 'nan' && $precioBase == 'nan' && $precioTope == 'nan' ) {
         $stmt = $anuncios->getAnunciosPagination($currentPage, $itemsPerPage, $sortByOption);
     }
     else
+    // OPtional Params
         $stmt = $anuncios->getAnunciosPaginationOptParams($tipo, $marca, $modelo, $ubicacion, $precioBase, $precioTope, $currentPage, $itemsPerPage, $sortByOption);
 
-    
+    // var_dump($stmt);
+
     // Iterate Results
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
         

@@ -81,22 +81,16 @@
                 $get_stmt = $this->conn->prepare("CALL getLastVehiculo()");
             
                 $get_stmt->execute();
-            
-
+    
 
                 $resultsArray = $get_stmt->fetch(PDO::FETCH_ASSOC);
 
                 
-                //   print_r(json_encode($resultsArray));
-
-                // $vehiculo->id_vehiculo = json_encode($resultsArray);
-        
-                // return $$vehiculo->id_vehiculo;
 
                 echo (json_encode($resultsArray));
 
 
-                // return true;
+              
             }
             else
                 return false;

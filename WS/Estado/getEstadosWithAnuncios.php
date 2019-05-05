@@ -1,6 +1,6 @@
 <?php
     /* ==========================================================================
-    ** Get Anuncio Details Web Service
+    ** Get Estados Web Service
     ** 24/01/2019
     ** Alan Medina Silva
     ** ========================================================================== */
@@ -15,34 +15,30 @@
     // get database connection
     include_once '../config/database.php';    
     // instantiate user object
-    include_once '../objects/anuncios/Anuncios.php';
+    include_once '../objects/estado/Estado.php';
 
     
     $database = new Database();
     $db = $database->getConnection();
     
-    $anuncios = new Anuncios($db);
+    $estado = new Estado($db);
 
-    // Get Varaibles
-    $anuncios->id_anuncio = isset($_GET['id_anuncio']) ? $_GET['id_anuncio'] : die();
-    $editAnuncio =  isset($_GET['edit_anuncio']) ? $_GET['edit_anuncio'] : false;
-    // echo $anuncios->id_anuncio;
 
     // read the details of user to be edited
-
-    if($editAnuncio == true) 
-        $stmt = $anuncios->getAnuncioDetailsEdit($anuncios->id_anuncio);
-    else
-        $stmt = $anuncios->getAnuncioDetails($anuncios->id_anuncio);
-
-    // $stmt = $anuncios->getAll();
+    $stmt = $estado->getEstadosWithAnuncios();
 
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-        // echo (json_encode($row));
-        $resultsArray = $row;
+        // echo $row;
+        $resultsArray[] = $row;
     }
+    
+
+    if(isset($resultsArray))
+        echo (json_encode($resultsArray));
+    else
+        echo (json_encode([]));
 
     // Make JSON Format
-    echo (json_encode($resultsArray));
+    
 
 ?>
